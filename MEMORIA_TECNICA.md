@@ -150,8 +150,23 @@ Arquitecto → Investigador/API → UI/UX → Implementador → Security/QA → 
 |----------|----------|
 | Rate limiting de API | Implementado RateLimiter con cola de espera |
 | Datos no persistentes | Cache en memoria con TTL de 5 minutos |
-| Validación分散ada | Módulo Validators centralizado |
+| Validación dispersada | Módulo Validators centralizado |
 | Sesiones inseguras | Expiración de 24h y almacenamiento limitado |
+| Login visibility | Corregido hide/show de vistas en navegación SPA |
+| AlertPanel events | Mejorado binding con múltiples handlers (onclick, onsubmit) |
+| SearchBar init timing | Movido init() de DashboardPage.init() a DashboardPage.show() |
+| Favorites toggle | Cambiado a classList nativo para mejor compatibilidad |
+| Panel initialization | isInitialized flag para evitar duplicación |
+
+## 10.1 Problemas v2.0 - Sistema Multiagente
+
+| Problema | Solución |
+|----------|----------|
+| SignalsPanel no actualizaba | Inicialización correcta desde DashboardPage.show() |
+| AlertPanel form no respondía | onsubmit handler con preventDefault + Enter key support |
+| Missing Formatters methods | Añadidos formatCurrency y formatNumber |
+| Missing DOM.toggle() | Añadido método toggle() a utils/dom.js |
+| SearchBar init en página oculta | init() solo al mostrar vista, no al cargar página |
 
 ## 11. Decisiones Técnicas
 
@@ -268,7 +283,168 @@ El proyecto ha permitido demostrar:
 - Implementación de patrones de diseño
 - Focus en seguridad, accesibilidad y rendimiento
 
-## 20. Mejoras Futuras
+## 20. Sistema Multiagente v2.1
+
+### 20.1 Justificación y Evolución
+
+El sistema multiagente se implementó para evolucionar el dashboard de una simple herramienta de visualización a una **aplicación inteligente** que:
+- Automatiza el análisis de mercado
+- Genera señales procesables sin intervención del usuario
+- Proporciona alertas personalizadas
+- Ofrece insights automáticos sobre el portfolio del usuario
+- Responde a comandos de texto de forma conversacional
+
+### 20.2 Definición de Agente (v2.1)
+
+Un **agente** es un módulo autónomo especializado que:
+1. Recibe contexto y datos del sistema
+2. Observa el estado del mercado o aplicación
+3. Aplica reglas o lógica propia
+4. Toma decisiones dentro de su dominio
+5. Ejecuta acciones concretas sin programación manual
+
+### 20.3 Agentes Implementados
+
+#### MarketAgent
+- **Responsabilidad**: Analizar datos de mercado, detectar oportunidades, generar señales
+- **Reglas**:
+  - Bullish: cambio > 4% y volumen alto
+  - Bearish: cambio < -5%
+  - Volatile: cambio absoluto > 8%
+  - High-interest: volumen alto + market cap alto + cambio positivo
+- **Salidas**: Array de señales categorizadas, resumen de sentimiento del mercado
+
+#### AlertAgent
+- **Responsabilidad**: Gestionar alertas configurables por el usuario
+- **Tipos de alerta**: Precio sobrevalor, precio bajo valor, % ganancia, % pérdida
+- **Persistencia**: localStorage con clave `cv_alerts`
+- **Salidas**: Alertas disparadas, notificaciones toast
+
+#### PortfolioAgent
+- **Responsabilidad**: Analizar favoritos, generar insights, resumir portfolio
+- **Métricas**: Mejor/peor activo, cambio promedio, distribución positiva/negativa, volatilidad
+- **Insights generados**: Oportunidades, warnings, tendencias, distribución
+- **Persistencia**: localStorage con clave `cv_portfolio_history`
+
+#### AssistantAgent
+- **Responsabilidad**: Procesar comandos de texto, transformar en acciones
+- **Parser**: Basado en keywords y sinónimos
+- **Intents**: top_subidas, top_bajadas, mayor_volumen, resumen_mercado, etc.
+- **No usa LLM**: Primera versión 100% basada en reglas deterministas
+
+#### OrchestratorAgent
+- **Responsabilidad**: Coordinar ejecución de agentes, distribuir datos, recoger resultados
+- **Eventos**: Subscribe a cambios de Store, ejecutar agentes periódicamente
+- **Tolerancia**: Manejo de errores en cada agente individual
+
+### 20.4 Arquitectura Técnica
+
+```
+BaseAgent (clase abstracta)
+    ├── observe()
+    ├── analyze()
+    ├── decide()
+    ├── act()
+    ├── run()
+    ├── on/emit (eventos)
+    └── _createResult()
+
+MarketAgent → extend BaseAgent
+AlertAgent → extend BaseAgent
+PortfolioAgent → extend BaseAgent
+AssistantAgent → extend BaseAgent
+OrchestratorAgent → extend BaseAgent
+```
+
+### 20.5 Integración con Módulos Existentes
+
+| Módulo | Integración |
+|--------|-------------|
+| Store | Subscribe a cambios, leer coins/favorites |
+| CryptoService | Obtener datos de mercado |
+| Storage | Persistencia de alertas y historial |
+| Toast | Notificaciones de alertas disparadas |
+| Metrics | Registrar ejecuciones y errores de agentes |
+| Router | Navegación desde comandos del asistente |
+| DashboardPage | Panel de señales |
+| FavoritesPage | Panel de insights |
+
+### 20.6 UI de Agentes
+
+- **SignalsPanel**: Muestra señales del mercado en dashboard
+- **AlertPanel**: Gestión completa de alertas (crear/editar/eliminar)
+- **PortfolioInsights**: Resumen inteligente en favoritos
+- **AssistantPanel**: Chat flotante para comandos
+
+### 20.7 Métricas de Agentes
+
+```javascript
+agent_marketagent_executions
+agent_marketagent_errors
+agent_alertagent_executions
+agent_alertagent_errors
+agent_portfolioagent_executions
+agent_portfolioagent_errors
+agent_assistantagent_executions
+agent_assistantagent_errors
+alerts_created
+alerts_removed
+alerts_triggered
+assistant_queries
+orchestrator_started
+orchestrator_stopped
+```
+
+### 20.8 Integración y Debugging
+
+Durante la integración del sistema multiagente se encontraron y corrigieron los siguientes problemas:
+
+1. **Login Visibility Issue**: Las vistas no se ocultaban correctamente durante la navegación. Solución: Mejora en hide/show de vistas en Router.
+
+2. **AlertPanel Event Binding**: Los eventos del formulario no se bindeaban porque el panel se creaba dinámicamente antes de estar visible. Solución: Múltiples handlers (onclick, onsubmit) y Enter key support.
+
+3. **SearchBar Initialization**: SearchBar.init() se llamaba en DashboardPage.init() cuando los elementos DOM aún no estaban visibles. Solución: Mover init() a DashboardPage.show().
+
+4. **Panel Initialization Timing**: Los paneles se inicializaban múltiples veces. Solución: Añadir flag isInitialized y verificar antes de init().
+
+5. **SignalsPanel Not Updating**: Dipendía del Orchestrator que no proporcionaba datos correctamente. Solución: Llamar updateWithCoins() directamente desde DashboardPage.loadCoins().
+
+6. **Missing Formatters Methods**: formatCurrency y formatNumber no existían. Solución: Añadir ambos métodos a formatters.js.
+
+7. **DOM.toggle() Missing**: El método toggle() no existía en utils/dom.js. Solución: Implementar método con soporte para show/hide/toggle.
+
+8. **CryptoCard Favorites**: Usaba DOM.addClass/removeClass que podían fallar. Solución: Cambiar a classList nativo.
+
+### 20.9 Flujo de Integración Final
+
+```
+main.js
+  ├─ DashboardPage.init() → cacheElements()
+  ├─ Router.init() → setupRoutes()
+  └─ Agents.init() → OrchestratorAgent.start()
+
+Router.navigate(dashboard)
+  └─ DashboardPage.show()
+      ├─ SearchBar.init() [solo si no está inicializado]
+      ├─ SignalsPanel.init() [crea DOM si no existe]
+      ├─ AlertPanel.init() [crea DOM si no existe]
+      └─ loadCoins()
+          ├─ CryptoService.fetchCoins()
+          ├─ renderCoins() → CryptoCard.create() × N
+          ├─ SignalsPanel.updateWithCoins() [actualiza señales]
+          └─ updateStats()
+```
+
+### 20.10 Persistencia de Datos de Agentes
+
+| Clave localStorage | Contenido | Formato |
+|-------------------|-----------|---------|
+| `cv_alerts` | Alertas configuradas | JSON Array |
+| `cv_market_signals_history` | Historial de señales | JSON Array |
+| `cv_portfolio_history` | Historial de análisis | JSON Array |
+| `cv_assistant_history` | Conversación asistente | JSON Array |
+
+## 21. Mejoras Futuras
 
 1. **Gráficos de precios**: Integración con Chart.js
 2. **Historial de búsquedas**: Persistencia de búsquedas recientes
@@ -277,12 +453,15 @@ El proyecto ha permitido demostrar:
 5. **PWA**: Service workers para offline
 6. **Testing**: Jest para unit tests
 7. **Build**: Webpack o Vite para producción
+8. **LLM Assistant**: Integración opcional con API de OpenAI para respuestas más naturales
+9. **Notificaciones push**: Web Push API para alertas fuera de la app
+10. **Backtesting**: Simulación histórica de estrategias basadas en señales
 
 ---
 
 ## Anexo: Prompts Destacados
 
-### Definición de agentes
+### Definición de agentes (v1)
 ```
 Define 8 agentes especializados para un proyecto de dashboard de criptomonedas...
 ```
@@ -297,7 +476,13 @@ Investiga las mejores APIs públicas de criptomonedas, compara CoinGecko, CoinCa
 Diseña una arquitectura modular para una SPA de criptomonedas con HTML, CSS y JS vanilla...
 ```
 
+### Sistema Multiagente (v2)
+```
+Quiero que actúes como un equipo de ingeniería de software multiagente...
+```
+
 ---
 
 **Proyecto desarrollado con Opencode y metodología multiagente**
 **Fecha: Marzo 2026**
+**Versión: 2.1.0 - Sistema Multiagente Estabilizado**

@@ -1,7 +1,10 @@
 window.SearchBar = {
+    isInitialized: false,
     init() {
+        if (this.isInitialized) return;
         this.cacheElements();
         this.bindEvents();
+        this.isInitialized = true;
     },
 
     cacheElements() {

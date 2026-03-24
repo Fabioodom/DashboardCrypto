@@ -9,7 +9,23 @@ window.Metrics = {
             favorites_added: 0,
             errors: 0,
             api_calls: 0,
-            session_start: Date.now()
+            session_start: Date.now(),
+            agent_marketagent_executions: 0,
+            agent_marketagent_errors: 0,
+            agent_alertagent_executions: 0,
+            agent_alertagent_errors: 0,
+            agent_portfolioagent_executions: 0,
+            agent_portfolioagent_errors: 0,
+            agent_assistantagent_executions: 0,
+            agent_assistantagent_errors: 0,
+            agent_orchestratoragent_executions: 0,
+            agent_orchestratoragent_errors: 0,
+            alerts_created: 0,
+            alerts_removed: 0,
+            alerts_triggered: 0,
+            assistant_queries: 0,
+            orchestrator_started: 0,
+            orchestrator_stopped: 0
         });
         this._startTime = performance.now();
         this._log('Metrics initialized');
@@ -52,7 +68,23 @@ window.Metrics = {
             favorites_added: 0,
             errors: 0,
             api_calls: 0,
-            session_start: Date.now()
+            session_start: Date.now(),
+            agent_marketagent_executions: 0,
+            agent_marketagent_errors: 0,
+            agent_alertagent_executions: 0,
+            agent_alertagent_errors: 0,
+            agent_portfolioagent_executions: 0,
+            agent_portfolioagent_errors: 0,
+            agent_assistantagent_executions: 0,
+            agent_assistantagent_errors: 0,
+            agent_orchestratoragent_executions: 0,
+            agent_orchestratoragent_errors: 0,
+            alerts_created: 0,
+            alerts_removed: 0,
+            alerts_triggered: 0,
+            assistant_queries: 0,
+            orchestrator_started: 0,
+            orchestrator_stopped: 0
         };
         this._save();
         this._log('Metrics reset');

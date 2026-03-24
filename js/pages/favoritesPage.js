@@ -16,6 +16,7 @@ window.FavoritesPage = {
         
         if (favoriteIds.length === 0) {
             this.showEmpty();
+            PortfolioInsights.showEmpty();
             return;
         }
 
@@ -28,6 +29,7 @@ window.FavoritesPage = {
             });
 
             this.renderFavorites(coins);
+            PortfolioInsights.show(coins);
         } catch (error) {
             this.showError(ErrorHandler.getUserMessage(ErrorHandler.handle(error, 'favorites')));
         }
@@ -78,10 +80,12 @@ window.FavoritesPage = {
 
     show() {
         DOM.$('#favorites-view').classList.remove('hidden');
+        PortfolioInsights.init();
         this.load();
     },
 
     hide() {
         DOM.$('#favorites-view').classList.add('hidden');
+        PortfolioInsights.hide();
     }
 };

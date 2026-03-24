@@ -17,12 +17,34 @@ const Formatters = {
         return new Intl.NumberFormat('en-US', options).format(value);
     },
 
+    formatCurrency(value) {
+        if (value === null || value === undefined) return '-';
+        return new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD',
+            minimumFractionDigits: 2,
+            maximumFractionDigits: value < 1 ? 6 : 2
+        }).format(value);
+    },
+
     number(value, decimals = 2) {
         if (value === null || value === undefined) return '-';
         return new Intl.NumberFormat('en-US', {
             minimumFractionDigits: decimals,
             maximumFractionDigits: decimals
         }).format(value);
+    },
+
+    formatNumber(value) {
+        if (value === null || value === undefined) return '-';
+        if (value >= 1e9) {
+            return (value / 1e9).toFixed(2) + 'B';
+        } else if (value >= 1e6) {
+            return (value / 1e6).toFixed(2) + 'M';
+        } else if (value >= 1e3) {
+            return (value / 1e3).toFixed(2) + 'K';
+        }
+        return new Intl.NumberFormat('en-US').format(value);
     },
 
     compactNumber(value) {

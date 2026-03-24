@@ -13,7 +13,11 @@ const APP_CONFIG = {
         AUTH: 'cv_auth',
         FAVORITES: 'cv_favorites',
         METRICS: 'cv_metrics',
-        CACHE: 'cv_cache'
+        CACHE: 'cv_cache',
+        ALERTS: 'cv_alerts',
+        MARKET_SIGNALS_HISTORY: 'cv_market_signals_history',
+        PORTFOLIO_HISTORY: 'cv_portfolio_history',
+        ASSISTANT_HISTORY: 'cv_assistant_history'
     }
 };
 

@@ -67,6 +67,17 @@ const DOM = {
         if (el) el.classList.add('hidden');
     },
 
+    toggle(el, show) {
+        if (!el) return;
+        if (show === undefined) {
+            el.classList.toggle('hidden');
+        } else if (show) {
+            el.classList.remove('hidden');
+        } else {
+            el.classList.add('hidden');
+        }
+    },
+
     on(el, event, handler, options) {
         if (el) el.addEventListener(event, handler, options);
     },

@@ -2,6 +2,62 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.1.0] - 2026-03-24
+
+### Fixed
+- **Login visibility**: Corregido problema de visibilidad de vistas durante navegación
+- **AlertPanel events**: Corregido binding de eventos del formulario de alertas (submit, Enter key)
+- **Filters/SearchBar**: Corregida inicialización tardía que causaba que los filtros no funcionaran
+- **Favorites**: Corregido toggle de favoritos con classList nativo
+- **Panel initialization**: Corregido timing de inicialización de paneles (solo al mostrar vista)
+- **Formatters**: Añadidos métodos `formatCurrency` y `formatNumber`
+- **DOM utilities**: Añadido método `toggle()` a la utilidad DOM
+
+### Changed
+- `SearchBar.init()` movido de `DashboardPage.init()` a `DashboardPage.show()` para asegurar DOM disponible
+- `DashboardPage.show()` ahora inicializa SearchBar, SignalsPanel y AlertPanel en orden correcto
+- `AlertPanel.bindEvents()` mejorado con múltiples handlers (onclick, onsubmit, keydown)
+- `CryptoCard.toggleFavorite()` usa classList nativo para mejor compatibilidad
+
+### Technical
+- Añadido flag `isInitialized` a SearchBar con check en init()
+- Mejorado manejo de nulos en event handlers de AlertPanel
+- Refactorizado flujo de navegación de vistas
+
+---
+
+## [2.0.0] - 2026-03-24
+
+### Added
+- **Sistema Multiagente** - Nueva arquitectura de agentes funcionales integrados en el front-end
+  - `MarketAgent`: Análisis de mercado y generación de señales (alcistas, bajistas, volátiles)
+  - `AlertAgent`: Gestión de alertas configurables por usuario con persistencia
+  - `PortfolioAgent`: Análisis inteligente de favoritos con insights automáticos
+  - `AssistantAgent`: Asistente conversacional basado en reglas con parser de intents
+  - `OrchestratorAgent`: Coordinador central de todos los agentes
+- **Panel de Señales** - UI para visualizar señales del mercado generadas por MarketAgent
+- **Panel de Alertas** - Gestión completa de alertas (crear, editar, eliminar, activar/desactivar)
+- **Panel de Portfolio** - Resumen inteligente con métricas e insights de favoritos
+- **Asistente Virtual** - Chat flotante para comandos de texto
+- **Métricas de Agentes** - Registro de ejecuciones, errores y eventos de cada agente
+- **Persistencia de Agentes** - Historial de señales, alertas, portfolio y conversación del asistente
+
+### Technical
+- Nueva carpeta `/js/agents/` con arquitectura modular de agentes
+- Clase `BaseAgent` como clase base con patrón observe-analyze-decide-act
+- Sistema de eventos para comunicación entre agentes
+- Integración con Store, Storage, Metrics y Toast existentes
+- CSS específico para componentes de agentes (`styles/agents.css`)
+
+### Changed
+- `main.js`: Inicialización del sistema multiagente
+- `dashboardPage.js`: Integración de SignalsPanel y AlertPanel
+- `favoritesPage.js`: Integración de PortfolioInsights
+- `constants.js`: Nuevas claves de storage para agentes
+- `metrics.js`: Nuevas métricas para agentes
+
+---
+
 ## [1.0.0] - 2026-03-15
 
 ### Added
@@ -36,17 +92,19 @@ All notable changes to this project will be documented in this file.
 
 ## Versiones Futuras (Propuestas)
 
-### [1.1.0] - Planned
+### [2.2.0] - Planned
 - Gráficos de precios (Chart.js)
 - Historial de búsquedas
 - Modo oscuro/claro
+- Notificaciones push
 
-### [2.0.0] - Planned
+### [3.0.0] - Planned
 - Backend con autenticación real
 - Base de datos de usuarios
 - API REST propia
 - Tests automatizados
 - PWA
+- Integración con LLM para asistente
 
 ---
 

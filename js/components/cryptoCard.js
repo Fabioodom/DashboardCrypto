@@ -73,14 +73,14 @@ window.CryptoCard = {
         
         if (isFavorite) {
             Favorites.remove(coinId);
-            DOM.removeClass(btn, 'active');
+            btn.classList.remove('active');
             btn.textContent = '☆';
             btn.setAttribute('aria-label', 'Añadir a favoritos');
             btn.setAttribute('aria-pressed', 'false');
             Toast.show('Eliminado de favoritos', 'success');
         } else {
             Favorites.add(coinId);
-            DOM.addClass(btn, 'active');
+            btn.classList.add('active');
             btn.textContent = '★';
             btn.setAttribute('aria-label', 'Quitar de favoritos');
             btn.setAttribute('aria-pressed', 'true');

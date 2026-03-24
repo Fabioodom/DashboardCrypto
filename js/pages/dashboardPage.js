@@ -6,7 +6,6 @@ window.DashboardPage = {
 
     init() {
         this.cacheElements();
-        SearchBar.init();
     },
 
     cacheElements() {
@@ -50,6 +49,10 @@ window.DashboardPage = {
             Store.updateCoins(coins);
             this.renderCoins(coins);
             this.updateStats();
+            
+            SignalsPanel.show();
+            SignalsPanel.updateWithCoins(coins);
+            AlertPanel.show();
             
         } catch (error) {
             this.showError(ErrorHandler.getUserMessage(ErrorHandler.handle(error, 'dashboard')));
@@ -109,10 +112,15 @@ window.DashboardPage = {
 
     show() {
         DOM.$('#dashboard-view').classList.remove('hidden');
+        SearchBar.init();
+        SignalsPanel.init();
+        AlertPanel.init();
         this.loadCoins();
     },
 
     hide() {
         DOM.$('#dashboard-view').classList.add('hidden');
+        SignalsPanel.hide();
+        AlertPanel.hide();
     }
 };
